@@ -1,0 +1,34 @@
+name: Auto Build and Deploy  #actions名称，可自定义
+
+on: 
+  push:   
+    branches:      
+      - master 
+      
+jobs:     
+  build-deploy:    
+    runs-on: ubuntu-18.04    
+    steps:       
+      - uses: actions/checkout@v2         
+      # with:       
+      #   submodules: true 
+      
+      - name: Setup Hugo        
+        uses: peaceiris/actions-hugo@v2        
+        with:          
+          hugo-version: 'latest'          
+          extended: true  
+
+
+      - name: Build Hugo Site        
+        run: hugo --minify        #生成站点      
+        
+      - name: Deploy to GitHub pages        
+        uses: peaceiris/actions-gh-pages@v3        
+        with:          
+          deploy_key: ${{ secrets.ACTIONSDEPLOYKEY }} # 同上面私钥(Private Key)变量名          
+          external_repository: ednahlili/ednahlili.github.io # Github Pages远程地址          
+          publish_dir: "./public" #推送目录          
+          keep_files: false # 删除已存在文件          
+          publish_branch: master  # 推送          
+          commit_message: ${{ github.event.head_commit.message }}
